@@ -768,7 +768,10 @@ class UIEditor:
         panel.fill(self.HUD_BG)
         panel.set_alpha(200)
 
-        screen.blit(panel, (16, 16))
+        margin = 16
+        panel_y = screen.get_height() - panel_height - margin
+
+        screen.blit(panel, (margin, panel_y))
 
         for index, line in enumerate(lines):
 
@@ -780,5 +783,5 @@ class UIEditor:
 
             screen.blit(
                 text_surface,
-                (32, 28 + index * 22)
+                (margin + 16, panel_y + 12 + index * 22)
             )

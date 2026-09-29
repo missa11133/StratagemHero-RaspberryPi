@@ -4,66 +4,86 @@
     "round_label": {
       "anchor": "center",
       "pos": [
-        103,
-        110
-      ]
+        197,
+        157
+      ],
+      "font_size": 26
     },
     "round_number": {
-      "anchor": "center",
+      "anchor": "midleft",
       "pos": [
-        98,
-        135
-      ]
+        212,
+        200
+      ],
+      "font_size": 52
     },
     "score_value": {
-      "anchor": "center",
+      "anchor": "midleft",
       "pos": [
-        937,
-        127
-      ]
+        756,
+        192
+      ],
+      "font_size": 52
     },
     "score_label": {
       "anchor": "center",
       "pos": [
-        924,
-        103
-      ]
+        849,
+        224
+      ],
+      "font_size": 26
     },
     "stratagem_title": {
       "anchor": "center",
       "pos": [
-        512,
-        220
+        520,
+        308
+      ],
+      "font_size": 24
+    },
+    "stratagem_title_background": {
+      "anchor": "center",
+      "pos": [
+        520,
+        306
+      ],
+      "size": [
+        484,
+        26
       ]
     },
     "arrows": {
       "anchor": "center",
       "pos": [
         512,
-        384
+        354
       ]
     },
     "queue": {
       "anchor": "center",
       "pos": [
-        250,
-        142
+        348,
+        225
+      ],
+      "size": [
+        106,
+        106
       ]
     },
     "timer_bar": {
       "anchor": "center",
       "pos": [
         512,
-        458
+        426
       ],
       "size": [
-        560,
-        12
+        472,
+        18
       ]
     }
   },
   "metrics": {
-    "arrows_spacing": 70,
-    "queue_spacing": 105
+    "arrows_spacing": 51,
+    "queue_spacing": 68
   }
 }

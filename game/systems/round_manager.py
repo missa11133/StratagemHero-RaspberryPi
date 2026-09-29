@@ -26,7 +26,7 @@ class RoundManager:
 
         self.stratagems = stratagems
 
-        self.round_number = 1
+        self.round_number = 512
 
         self.score = 50604615
 

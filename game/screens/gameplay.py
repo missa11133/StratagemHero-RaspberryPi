@@ -23,6 +23,7 @@ class GameplayScreen:
 
     SUCCESS_COLOR = (255, 238, 0)
     ERROR_COLOR = (254, 134, 74) #(222, 123, 108)
+    TITLE_COLOR = (0, 0, 0)
 
     # Неактивные стрелки
     INACTIVE_ALPHA = 255 #90
@@ -92,7 +93,12 @@ class GameplayScreen:
         },
         "stratagem_title": {
             "anchor": "center",
+            "pos": [512, 155]
+        },
+        "stratagem_title_background": {
+            "anchor": "center",
             "pos": [512, 155],
+            "size": [840, 72],
         },
         "arrows": {
             "anchor": "center",
@@ -101,6 +107,7 @@ class GameplayScreen:
         "queue": {
             "anchor": "center",
             "pos": [250, 90],
+            "size": [106, 106],
         },
         "timer_bar": {
             "anchor": "topleft",
@@ -111,8 +118,10 @@ class GameplayScreen:
 
     # Числовые параметры разметки (отступы, шаги)
     DEFAULT_METRICS = {
-        "arrows_spacing": 70,
-        "queue_spacing": 105,
+
+        # Шаг между центрами стрелок.
+        "arrows_spacing": 45 + 1,
+        "queue_spacing": -50    ,
     }
 
     # ==================================================
@@ -120,13 +129,20 @@ class GameplayScreen:
     # ==================================================
 
     # Сколько стратагем одновременно видно в очереди
-    QUEUE_VISIBLE = 5
+    QUEUE_VISIBLE = 6
 
     # Во сколько раз уменьшаются стратагемы
-    SMALL_SCALE = 0.75
+    SMALL_SCALE = 0.5
 
     # Отступ квадратной рамки вокруг текущей стратагемы
     SQUARE_MARGIN = 12
+
+    # ==================================================
+    # Стрелки
+    # ==================================================
+
+    # Размер картинки стрелки на экране, пиксели
+    ARROW_SIZE = (45, 45)
 
     # ==================================================
     # Инициализация
@@ -191,6 +207,16 @@ class GameplayScreen:
             ).convert_alpha(),
         }
 
+        # Все стрелки приводятся к единому размеру ARROW_SIZE
+        for direction in self.arrow_images:
+
+            self.arrow_images[direction] = (
+                pygame.transform.smoothscale(
+                    self.arrow_images[direction],
+                    self.ARROW_SIZE
+                )
+            )
+
         # ==================================================
         # Анимация стрелок
         # ==================================================
@@ -227,8 +253,8 @@ class GameplayScreen:
             size = image.get_size()
 
             scale = min(
-                80 / size[0],
-                80 / size[1]
+                128 / size[0],
+                128 / size[1]
             )
 
             image = pygame.transform.smoothscale(
@@ -752,32 +778,21 @@ class GameplayScreen:
             stratagem = queue[queue_index]
 
             # Самая левая (текущая) стратагема — полный
-            # размер. Остальные — на 20% меньше.
             if i == 0:
 
                 image = self.stratagem_images[
                     stratagem.id
                 ]
+                x = start_x + i * spacing
 
             else:
 
                 image = self.stratagem_images_small[
                     stratagem.id
                 ]
+                x = start_x + i * spacing + 40
 
-            # Текущая стратагема — полная яркость
-            if queue_index == self.queue_index:
-
-                image.set_alpha(255)
-
-            # Будущие — приглушены
-            else:
-
-                image.set_alpha(
-                    self.INACTIVE_ALPHA
-                )
-
-            x = start_x + i * spacing
+            
 
             rect = image.get_rect(
                 center=(x, y)
@@ -882,13 +897,30 @@ class GameplayScreen:
         # Название текущей стратагемы
         # ==================================================
 
+        # Плашка под названием: рисуется первой, чтобы текст
+        # лёг поверх неё. Цвет плашки — SUCCESS_COLOR,
+        # цвет текста — TITLE_COLOR (см. константы выше).
+        #
+        # Свечение у названия выключено: glow_color по
+        # умолчанию берётся равным цвету текста, то есть
+        # ореол был бы чёрным (нулевая добавка при
+        # BLEND_RGB_ADD) — только лишний рендер и размытие.
+        background_rect = self.layout.rect(
+            "stratagem_title_background"
+        )
+
+        pygame.draw.rect(
+            screen,
+            self.SUCCESS_COLOR,
+            background_rect
+        )
+
         self.draw_text(
             screen,
             self.stratagem.title,
             self.layout.font_size("stratagem_title") or 42,
-            self.TEXT_COLOR,
-            self.layout.pos("stratagem_title"),
-            glow=True,
+            self.TITLE_COLOR,
+            self.layout.pos("stratagem_title")
         )
 
         # ==================================================
@@ -899,6 +931,8 @@ class GameplayScreen:
             self.stratagem.code
         )
 
+        # Шаг между центрами стрелок из разметки.
+        # Текущее значение 51 = ширина стрелки 45 + зазор 6
         spacing = self.layout.metric("arrows_spacing")
 
         start_x = (
@@ -1026,8 +1060,7 @@ class GameplayScreen:
                 bar_y,
                 bar_width,
                 bar_height
-            ),
-            border_radius=6
+            )
         )
 
         # --------------------------------------------------
@@ -1053,8 +1086,7 @@ class GameplayScreen:
                     bar_y,
                     current_width,
                     bar_height
-                ),
-                border_radius=6
+                )
             )
 
     def get_animated_arrow(
