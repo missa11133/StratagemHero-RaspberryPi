@@ -1,0 +1,47 @@
+Stratagem(
+    "Call_In_Super_Destroyer",
+    "CALL IN SUPER DESTROYER",
+    [
+        "UP",
+        "UP",
+        "DOWN",
+        "DOWN",
+        "LEFT",
+        "RIGHT",
+        "LEFT",
+        "RIGHT"
+    ],
+    "/Call_In_Super_Destroyer_Stratagem_Icon_Background.png",
+    FALSE
+)
+
+Stratagem(
+    "Cargo Container",
+    "CARGO CONTAINER",
+    [
+        "UP",
+        "UP",
+        "DOWN",
+        "DOWN",
+        "RIGHT",
+        "DOWN"
+    ],
+    "/Cargo_Container_Stratagem_Icon_Background.png",
+    FALSE
+)
+
+Stratagem(
+    "Portable Comms Relay",
+    "PORTABLE COMMS RELAY",
+    [
+        "UP",
+        "UP",
+        "DOWN",
+        "DOWN",
+        "LEFT",
+        "LEFT",
+        "DOWN"
+    ],
+    "/Cargo_Container_Stratagem_Icon_Background.png",
+    FALSE
+)

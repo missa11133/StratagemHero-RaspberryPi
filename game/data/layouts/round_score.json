@@ -1,0 +1,22 @@
+{
+  "screen": "round_score",
+  "elements": {
+    "row_label": {
+      "anchor": "midleft",
+      "pos": [
+        175,
+        190
+      ],
+      "font_size": 26
+    },
+    "row_value": {
+      "anchor": "midright",
+      "pos": [
+        844,
+        200
+      ],
+      "font_size": 52
+    }
+  },
+  "metrics": {}
+} 

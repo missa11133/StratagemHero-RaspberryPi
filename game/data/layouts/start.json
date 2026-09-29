@@ -1,0 +1,22 @@
+{
+  "screen": "start",
+  "elements": {
+    "title": {
+      "anchor": "center",
+      "pos": [
+        512,
+        285
+      ],
+      "font_size": 72
+    },
+    "start_hint": {
+      "anchor": "center",
+      "pos": [
+        512,
+        420
+      ],
+      "font_size": 34
+    }
+  },
+  "metrics": {}
+}

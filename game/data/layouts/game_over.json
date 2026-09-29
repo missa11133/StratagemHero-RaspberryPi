@@ -1,0 +1,30 @@
+{
+  "screen": "game_over",
+  "elements": {
+    "title": {
+      "anchor": "center",
+      "pos": [
+        512,
+        174
+      ],
+      "font_size": 72
+      },
+    "score": {
+      "anchor": "center",
+      "pos": [
+        512,
+        383
+      ],
+      "font_size": 26
+    },
+    "score_num": {
+      "anchor": "center",
+      "pos": [
+        512,
+        417
+      ],
+      "font_size": 52
+    }
+  },
+  "metrics": {}
+}

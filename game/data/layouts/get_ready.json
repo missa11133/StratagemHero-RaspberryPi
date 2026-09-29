@@ -1,0 +1,38 @@
+{
+  "screen": "get_ready",
+  "elements": {
+    "round": {
+      "anchor": "center",
+      "pos": [
+        512,
+        380
+      ],
+      "font_size": 28
+    },
+    "title": {
+      "anchor": "center",
+      "pos": [
+        512,
+        285
+      ],
+      "font_size": 74
+    },
+    "theme": {
+      "anchor": "center",
+      "pos": [
+        512,
+        467
+      ],
+      "font_size": 26
+    },
+    "round_num": {
+      "anchor": "center",
+      "pos": [
+        513,
+        420
+      ],
+      "font_size": 52
+    }
+  },
+  "metrics": {}
+}

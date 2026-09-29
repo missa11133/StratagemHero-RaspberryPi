@@ -1,0 +1,69 @@
+{
+  "screen": "gameplay",
+  "elements": {
+    "round_label": {
+      "anchor": "center",
+      "pos": [
+        103,
+        110
+      ]
+    },
+    "round_number": {
+      "anchor": "center",
+      "pos": [
+        98,
+        135
+      ]
+    },
+    "score_value": {
+      "anchor": "center",
+      "pos": [
+        937,
+        127
+      ]
+    },
+    "score_label": {
+      "anchor": "center",
+      "pos": [
+        924,
+        103
+      ]
+    },
+    "stratagem_title": {
+      "anchor": "center",
+      "pos": [
+        512,
+        220
+      ]
+    },
+    "arrows": {
+      "anchor": "center",
+      "pos": [
+        512,
+        384
+      ]
+    },
+    "queue": {
+      "anchor": "center",
+      "pos": [
+        250,
+        142
+      ]
+    },
+    "timer_bar": {
+      "anchor": "center",
+      "pos": [
+        512,
+        458
+      ],
+      "size": [
+        560,
+        12
+      ]
+    }
+  },
+  "metrics": {
+    "arrows_spacing": 70,
+    "queue_spacing": 105
+  }
+}
