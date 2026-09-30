@@ -26,9 +26,9 @@ class RoundManager:
 
         self.stratagems = stratagems
 
-        self.round_number = 512
+        self.round_number = 1
 
-        self.score = 50604615
+        self.score = 0
 
         self.queue = []
 
@@ -36,9 +36,9 @@ class RoundManager:
 
         self.round_score = 0
 
-        self.round_bonus = 35825
-        self.time_bonus = 29
-        self.perfect_bonus = 100
+        self.round_bonus = 0
+        self.time_bonus = 0
+        self.perfect_bonus = 0
         self.round_total = 0
 
         self.create_round()

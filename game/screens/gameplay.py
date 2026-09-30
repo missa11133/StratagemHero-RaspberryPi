@@ -22,7 +22,7 @@ class GameplayScreen:
     TEXT_COLOR = (240, 240, 240)
 
     SUCCESS_COLOR = (255, 238, 0)
-    ERROR_COLOR = (254, 134, 74) #(222, 123, 108)
+    ERROR_COLOR = (191, 81, 51) #(254, 134, 74) #(222, 123, 108)
     TITLE_COLOR = (0, 0, 0)
 
     # Неактивные стрелки
@@ -143,6 +143,44 @@ class GameplayScreen:
 
     # Размер картинки стрелки на экране, пиксели
     ARROW_SIZE = (45, 45)
+
+    # ==================================================
+    # Свечение графики (bloom)
+    # ==================================================
+
+    # Радиус отвечает за ШИРИНУ ореола, интенсивность — за его
+    # яркость: с ростом радиуса тот же свет размазывается дальше
+    # и у края бледнеет (у плашки добавка у края 46 при R=10 и
+    # 39 при R=22), поэтому широкое свечение делается вместе
+    # с интенсивностью ближе к 1.0.
+
+    # Стрелки ввода (картинка 45x45)
+    ARROW_GLOW_RADIUS = 16
+    ARROW_GLOW_INTENSITY = 1.0
+
+    # Сколько ступеней цвета у ореола анимируемой стрелки.
+    ARROW_GLOW_ANIMATION_STEPS = 5
+
+    # Плашка под названием стратагемы (484x26)
+    TITLE_GLOW_RADIUS = 22
+    TITLE_GLOW_INTENSITY = 1.0
+
+    # Полоса таймера (472x18)
+    TIMER_GLOW_RADIUS = 14
+    TIMER_GLOW_INTENSITY = 1.0
+
+    # Шаг длины, с которым кэшируется ореол короткого хвоста
+    # полосы (последние шесть радиусов таймера)
+    TIMER_GLOW_WIDTH_STEP = 2
+
+    # Рамка вокруг текущей стратагемы в очереди: радиус у неё
+    # самый маленький, потому что контур тонкий (2 px) — свет
+    # у тонкой линии размазывается сильнее, чем у большой
+    # заливки (замер яркости добавки у контура: R=4 даёт 36,
+    # R=6 — 24, R=8 — 12, R=12 — ореол пропадает вовсе)
+    QUEUE_FRAME_WIDTH = 2
+    QUEUE_GLOW_RADIUS = 6
+    QUEUE_GLOW_INTENSITY = 1.0
 
     # ==================================================
     # Инициализация
@@ -798,13 +836,17 @@ class GameplayScreen:
                 center=(x, y)
             )
 
-            screen.blit(
-                image,
-                rect
-            )
+            # ----------------------------------------------
+            # Рамка вокруг текущей стратагемы.
+            #
+            # Считается до картинки: ореол рамки должен лечь
+            # ПОД иконку, иначе свет подмешался бы к самой
+            # иконке. Контур рисуется после картинки — как
+            # и раньше.
+            # ----------------------------------------------
 
-            # Самая левая стратагема обведена
-            # квадратной рамкой
+            border_rect = None
+
             if i == 0:
 
                 side = (
@@ -821,11 +863,29 @@ class GameplayScreen:
 
                 border_rect.center = rect.center
 
+                bloom.blit_bloom_rect(
+                    screen,
+                    border_rect,
+                    self.accent_color,
+                    radius=self.QUEUE_GLOW_RADIUS,
+                    intensity=self.QUEUE_GLOW_INTENSITY,
+                    width=self.QUEUE_FRAME_WIDTH,
+                )
+
+            screen.blit(
+                image,
+                rect
+            )
+
+            # Самая левая стратагема обведена
+            # квадратной рамкой
+            if border_rect is not None:
+
                 pygame.draw.rect(
                     screen,
                     self.accent_color,
                     border_rect,
-                    width=2
+                    width=self.QUEUE_FRAME_WIDTH
                 )
 
     # ==================================================
@@ -845,6 +905,14 @@ class GameplayScreen:
 
         # ==================================================
         # РАУНД
+        #
+        # Обе надписи блока рисуются со свечением:
+        # "Round" — белым (TEXT_COLOR), номер раунда —
+        # акцентным цветом. Цвет свечения не задаём:
+        # glow_color по умолчанию берётся равным цвету
+        # текста, а радиус — bloom.default_radius(size).
+        # Обе подписи статичны, поэтому ореол считается
+        # один раз и дальше берётся из кэша bloom.
         # ==================================================
 
         self.draw_text(
@@ -852,7 +920,8 @@ class GameplayScreen:
             f"Round",
             self.layout.font_size("round_label") or 18,
             self.TEXT_COLOR,
-            self.layout.pos("round_label")
+            self.layout.pos("round_label"),
+            glow=True,
         )
 
         self.draw_text(
@@ -890,7 +959,8 @@ class GameplayScreen:
             f"SCORE",
             self.layout.font_size("score_label") or 18,
             self.TEXT_COLOR,
-            self.layout.pos("score_label")
+            self.layout.pos("score_label"),
+            glow=True,
         )
 
         # ==================================================
@@ -907,6 +977,16 @@ class GameplayScreen:
         # BLEND_RGB_ADD) — только лишний рендер и размытие.
         background_rect = self.layout.rect(
             "stratagem_title_background"
+        )
+
+        # Ореол плашки: под самой плашкой, чтобы аддитивный
+        # слой не подмешивался к её жёлтой заливке.
+        bloom.blit_bloom_rect(
+            screen,
+            background_rect,
+            self.SUCCESS_COLOR,
+            radius=self.TITLE_GLOW_RADIUS,
+            intensity=self.TITLE_GLOW_INTENSITY,
         )
 
         pygame.draw.rect(
@@ -950,6 +1030,11 @@ class GameplayScreen:
                 direction
             ]
 
+            # Цвет ореола стрелки. Он совпадает с цветом самой
+            # стрелки, а у исходной (белой) картинки ореол берёт
+            # цвет из неё самой — поэтому здесь None.
+            glow_color = None
+
             # ==================================================
             # ОШИБКА
             # ==================================================
@@ -964,6 +1049,8 @@ class GameplayScreen:
                         base_image,
                         self.ERROR_COLOR
                     )
+
+                    glow_color = self.ERROR_COLOR
 
                     arrow.set_alpha(255)
 
@@ -990,12 +1077,18 @@ class GameplayScreen:
                         self.arrow_animation_progress
                     )
 
+                    glow_color = self.get_arrow_glow_color(
+                        self.arrow_animation_progress
+                    )
+
                 elif index < self.current_index:
 
                     arrow = self.color_image(
                         base_image,
                         self.SUCCESS_COLOR
                     )
+
+                    glow_color = self.SUCCESS_COLOR
 
                     arrow.set_alpha(255)
 
@@ -1030,6 +1123,19 @@ class GameplayScreen:
                     start_x + index * spacing,
                     arrow_y
                 )
+            )
+
+            # Ореол стрелки: под самой стрелкой, цветом её
+            # текущего состояния. Ключ кэша — направление:
+            # цвет уже входит в него отдельно.
+            bloom.blit_bloom_image(
+                screen,
+                arrow,
+                arrow_rect,
+                color=glow_color,
+                radius=self.ARROW_GLOW_RADIUS,
+                intensity=self.ARROW_GLOW_INTENSITY,
+                key=direction,
             )
 
             screen.blit(
@@ -1076,6 +1182,25 @@ class GameplayScreen:
             bar_width * time_ratio
         )
 
+        # --------------------------------------------------
+        # Ореол заливки
+        #
+        # Рисуется под заливкой и следует за её длиной, поэтому
+        # светится ровно та часть полосы, которая ещё осталась
+        # (и меняет цвет вместе с accent_color в последние
+        # секунды раунда).
+        # --------------------------------------------------
+
+        bloom.blit_bloom_bar(
+            screen,
+            bar_rect,
+            current_width,
+            self.accent_color,
+            radius=self.TIMER_GLOW_RADIUS,
+            intensity=self.TIMER_GLOW_INTENSITY,
+            width_step=self.TIMER_GLOW_WIDTH_STEP,
+        )
+
         if current_width > 0:
 
             pygame.draw.rect(
@@ -1094,6 +1219,29 @@ class GameplayScreen:
         image,
         progress
     ):
+
+        # Цвет анимации вынесен в отдельный метод: тот же цвет
+        # нужен и ореолу стрелки (bloom).
+        color = self.get_animated_color(
+            progress
+        )
+
+        arrow = self.color_image(
+            image,
+            color
+        )
+
+
+        arrow.set_alpha(255)
+
+        return arrow
+
+    # ==================================================
+    # Цвет анимируемой стрелки
+    # ==================================================
+
+    def get_animated_color(self, progress):
+        """Цвет стрелки в анимации ввода: белый — акцентный."""
 
         # ----------------------------------------------
         # Цвет начала
@@ -1115,7 +1263,7 @@ class GameplayScreen:
         # Интерполяция RGB
         # ----------------------------------------------
 
-        color = (
+        return (
 
             int(
                 start_color[0]
@@ -1145,12 +1293,26 @@ class GameplayScreen:
             )
         )
 
-        arrow = self.color_image(
-            image,
-            color
+    def get_arrow_glow_color(self, progress):
+        """Цвет ореола анимируемой стрелки, округлённый по ступеням.
+
+        Цвет стрелки в анимации меняется каждый кадр, а сборка
+        ореола стоит около миллисекунды. Поэтому прогресс сначала
+        округляется до ARROW_GLOW_ANIMATION_STEPS ступеней: за
+        100 мс анимации кэш ореолов пополняется не больше пяти
+        раз вместо каждого кадра.
+        """
+
+        steps = max(
+            1,
+            self.ARROW_GLOW_ANIMATION_STEPS
         )
 
+        stepped = min(
+            steps,
+            int(progress * steps + 0.5)
+        ) / steps
 
-        arrow.set_alpha(255)
-
-        return arrow
+        return self.get_animated_color(
+            stepped
+        )
