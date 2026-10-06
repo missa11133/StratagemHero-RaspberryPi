@@ -18,10 +18,10 @@
       "font_size": 52
     },
     "score_value": {
-      "anchor": "midleft",
+      "anchor": "midright",
       "pos": [
-        756,
-        192
+        891,
+        193
       ],
       "font_size": 52
     },

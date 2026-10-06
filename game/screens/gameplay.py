@@ -38,6 +38,29 @@ class GameplayScreen:
     DANGER_COLOR = (222, 40, 40)
 
     # ==================================================
+    # Счётчик FPS (только для тестов)
+    #
+    # Выводится поверх всей графики геймплея в правом
+    # верхнем углу. После тестов выключается флагом
+    # SHOW_FPS = False (на другие экраны не выходит).
+    # ==================================================
+
+    # Показывать счётчик кадров
+    SHOW_FPS = True
+
+    # Как часто обновляется значение, миллисекунды.
+    # За 500 мс успевает набраться достаточно кадров,
+    # чтобы среднее не скакало из кадра в кадр.
+    FPS_UPDATE_INTERVAL = 500
+
+    FPS_FONT_SIZE = 22
+    FPS_COLOR = (0, 255, 140)
+
+    # Правый верхний угол: счёт (x=730) и таймер
+    # (y=355) сюда не заходят.
+    FPS_POSITION = (SCREEN_WIDTH - 12, 12)
+
+    # ==================================================
     # Время
     # ==================================================
 
@@ -205,6 +228,20 @@ class GameplayScreen:
             self.DEFAULT_LAYOUT,
             self.DEFAULT_METRICS
         )
+
+        # ==================================================
+        # Тестовый счётчик FPS
+        #
+        # Накопители считаются только пока экран геймплея
+        # отрисовывается, поэтому сбрасываются в reset()
+        # не должны.
+        # ==================================================
+
+        self.fps_value = 0.0
+        self.fps_frames = 0
+        self.fps_elapsed = 0
+        self.fps_surface = None
+        self.fps_background = None
 
         # ==================================================
         # Фон
@@ -752,6 +789,7 @@ class GameplayScreen:
         glow_color=None,
         radius=None,
         intensity=0.7,
+        anchor="center"
     ):
 
         bloom.blit_bloom(
@@ -763,6 +801,7 @@ class GameplayScreen:
             glow_color=glow_color,
             radius=radius if glow else 0,
             intensity=intensity,
+            anchor=anchor,
         )
 
     # ==================================================
@@ -889,6 +928,80 @@ class GameplayScreen:
                 )
 
     # ==================================================
+    # Тестовый счётчик FPS
+    # ==================================================
+
+    def update_fps_counter(self):
+        """Накопление кадров и пересчёт значения FPS.
+
+        Среднее считается вручную, а не через
+        clock.get_fps(): тот сглажен pygame по последним
+        кадрам и отдаёт 0 первые несколько тиков.
+        """
+
+        if not self.SHOW_FPS:
+            return
+
+        self.fps_frames += 1
+
+        # Время между последними двумя tick() главного цикла
+        self.fps_elapsed += self.game.clock.get_time()
+
+        if self.fps_elapsed >= self.FPS_UPDATE_INTERVAL:
+
+            self.fps_value = (
+                self.fps_frames * 1000.0 / self.fps_elapsed
+            )
+
+            self.fps_frames = 0
+            self.fps_elapsed = 0
+
+            # Текст и подложка пересобираются только вместе
+            # со значением, а не каждый кадр
+            self.fps_surface = None
+            self.fps_background = None
+
+    def draw_fps(self, screen):
+        """Оверлей FPS поверх всей графики (только тесты)."""
+
+        if not self.SHOW_FPS:
+            return
+
+        if self.fps_surface is None:
+
+            # До первого измерения (первые 500 мс) показываем
+            # прочерк, а не ноль
+            text = (
+                f"FPS: {self.fps_value:.0f}"
+                if self.fps_value > 0
+                else "FPS: --"
+            )
+
+            self.fps_surface = bloom.get_font(
+                self.FPS_FONT_SIZE
+            ).render(
+                text,
+                True,
+                self.FPS_COLOR,
+            )
+
+            # Полупрозрачная подложка: текст читается
+            # поверх яркого фона и свечения
+            self.fps_background = pygame.Surface(
+                self.fps_surface.get_size(),
+                pygame.SRCALPHA,
+            )
+
+            self.fps_background.fill((0, 0, 0, 150))
+
+        rect = self.fps_surface.get_rect(
+            topright=self.FPS_POSITION
+        )
+
+        screen.blit(self.fps_background, rect)
+        screen.blit(self.fps_surface, rect)
+
+    # ==================================================
     # Отрисовка
     # ==================================================
 
@@ -952,6 +1065,7 @@ class GameplayScreen:
             self.accent_color,
             self.layout.pos("score_value"),
             glow=True,
+            anchor="midright"
         )
 
         self.draw_text(
@@ -1213,6 +1327,13 @@ class GameplayScreen:
                     bar_height
                 )
             )
+
+        # ==================================================
+        # Тестовый счётчик FPS — последним, поверх всего
+        # ==================================================
+
+        self.update_fps_counter()
+        self.draw_fps(screen)
 
     def get_animated_arrow(
         self,

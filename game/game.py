@@ -39,14 +39,18 @@ GAME_MUSIC_PATH = "assets/sounds/game music.mp3"
 
 class Game:
 
-    def __init__(self, editor_mode=False):
+    def __init__(self, editor_mode=False, fullscreen=True):
 
         pygame.init()
 
         self.editor_mode = editor_mode
+        self.fullscreen = fullscreen
+
+        FULLSCREEN = pygame.FULLSCREEN if self.fullscreen else 0
 
         self.screen = pygame.display.set_mode(
-            (SCREEN_WIDTH, SCREEN_HEIGHT)
+            (SCREEN_WIDTH, SCREEN_HEIGHT),
+            FULLSCREEN,
         )
 
         self.round_manager = RoundManager(
