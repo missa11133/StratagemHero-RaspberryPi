@@ -820,6 +820,41 @@ STRATAGEMS = [
             True
         ),
 
+# 34
+
+    Stratagem(
+            "LAS-44 Nova",
+            "«LAS-44 Nova»",
+            [
+                "DOWN",
+                "LEFT",
+                "RIGHT",
+                "DOWN",
+                "DOWN"
+            ],
+            "Support Weapons",
+            "assets/images/stratagems/Support Weapons/Nova_Stratagem_Icon_Background.png",
+            True
+        ),
+
+# 35
+
+    Stratagem(
+            "AMW-20 Apex",
+            "«AMW-20 Apex»",
+            [
+                "DOWN",
+                "LEFT",
+                "LEFT",
+                "UP",
+                "DOWN",
+                "LEFT"
+            ],
+            "Support Weapons",
+            "assets/images/stratagems/Support Weapons/Apex_Stratagem_Icon_Background.png",
+            True
+        ),
+
 #      ___          _                 _       
 #     | _ ) __ _ __| |___ __  __ _ __| |__ ___
 #     | _ \/ _` / _| / / '_ \/ _` / _| / /(_-<
